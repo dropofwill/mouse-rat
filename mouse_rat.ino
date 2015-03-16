@@ -1,10 +1,13 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_LSM9DS0.h>
-#include <Adafruit_Sensor.h>  // not used in this demo but required!
+#include <Adafruit_Sensor.h>
+
+// If the timer isr is corrected
+// to not take so long change this to 0.
+//#define BYPASS_TIMER_ISR 1
 
 // i2c
-
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0();
 
 // You can also use software SPI
@@ -52,15 +55,17 @@ void setup() {
 void loop() {
   lsm.read();
 
-  Serial.print("Accel X: "); Serial.print((int)lsm.accelData.x); Serial.print(" ");
-  Serial.print("Y: "); Serial.print((int)lsm.accelData.y);       Serial.print(" ");
-  Serial.print("Z: "); Serial.println((int)lsm.accelData.z);     Serial.print(" ");
-  Serial.print("Mag X: "); Serial.print((int)lsm.magData.x);     Serial.print(" ");
-  Serial.print("Y: "); Serial.print((int)lsm.magData.y);         Serial.print(" ");
-  Serial.print("Z: "); Serial.println((int)lsm.magData.z);       Serial.print(" ");
-  Serial.print("Gyro X: "); Serial.print((int)lsm.gyroData.x);   Serial.print(" ");
-  Serial.print("Y: "); Serial.print((int)lsm.gyroData.y);        Serial.print(" ");
-  Serial.print("Z: "); Serial.println((int)lsm.gyroData.z);      Serial.println(" ");
-  Serial.print("Temp: "); Serial.print((int)lsm.temperature);    Serial.println(" ");
-  delay(200);
+//  Serial.print("Accel X: "); Serial.println((int)map(lsm.accelData.x), ); Serial.print(" ");
+//  Serial.print("Y: "); Serial.print((int)lsm.accelData.y);       Serial.print(" ");
+//  Serial.print("Z: "); Serial.println((int)lsm.accelData.z);     Serial.print(" ");
+  Serial.print("Mag X: "); Serial.println((int)lsm.magData.x);     Serial.print(" ");
+//  Serial.print("Y: "); Serial.print((int)lsm.magData.y);         Serial.print(" ");
+//  Serial.print("Z: "); Serial.println((int)lsm.magData.z);       Serial.print(" ");
+//  Serial.print("Gyro X: "); Serial.print((int)lsm.gyroData.x);   Serial.print(" ");
+//  Serial.print("Y: "); Serial.print((int)lsm.gyroData.y);        Serial.print(" ");
+//  Serial.print("Z: "); Serial.println((int)lsm.gyroData.z);      Serial.println(" ");
+//  Serial.print("Temp: "); Serial.print((int)lsm.temperature);    Serial.println(" ");
+  
+  delay(75);
 }
+
