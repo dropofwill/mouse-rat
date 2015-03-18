@@ -29,8 +29,23 @@
 
 /* Assign a unique base ID for this sensor */
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
+
+/* Or, use Hardware SPI:
+  SCK -> SPI CLK
+  SDA -> SPI MOSI
+  G_SDO + XM_SDO -> tied together to SPI MISO
+  then select any two pins for the two CS lines:
+*/
+
 #define LSM9DS0_XM_CS 10
 #define LSM9DS0_GYRO_CS 9
+
+//Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(LSM9DS0_XM_CS, LSM9DS0_GYRO_CS, 1000);
+/* Or, use Software SPI:
+  G_SDO + XM_SDO -> tied together to the MISO pin!
+  then select any pins for the SPI lines, and the two CS pins above
+*/
+
 #define LSM9DS0_SCLK 13
 #define LSM9DS0_MISO 12
 #define LSM9DS0_MOSI 11
@@ -38,8 +53,8 @@ Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
 float xNormal = -3.0;
 float yNormal = 1;
 
-float xRange[2] = [0,0]
-float yRange[2] = [0,0]
+float xRange[] = {0,0};
+float yRange[] = {0,0};
 
 void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
@@ -147,10 +162,9 @@ void loop(void) {
   }
 
   calibrate(accel.acceleration.x, accel.acceleration.y);
-
   Mouse.move(mx, my, 0);
 
-  // print out accelleration data
+//  print out accelleration data
 //  Serial.print("Accel X: "); Serial.print(accel.acceleration.x); Serial.print(" ");
 //  Serial.print("  \tY: "); Serial.print(accel.acceleration.y);   Serial.print(" ");
 //  Serial.print("  \tZ: "); Serial.print(accel.acceleration.z);   Serial.println("  \tm/s^2");
