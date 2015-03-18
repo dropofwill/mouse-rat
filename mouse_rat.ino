@@ -29,30 +29,11 @@
 
 /* Assign a unique base ID for this sensor */
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
-
-
-/* Or, use Hardware SPI:
-  SCK -> SPI CLK
-  SDA -> SPI MOSI
-  G_SDO + XM_SDO -> tied together to SPI MISO
-  then select any two pins for the two CS lines:
-*/
-
 #define LSM9DS0_XM_CS 10
 #define LSM9DS0_GYRO_CS 9
-//Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(LSM9DS0_XM_CS, LSM9DS0_GYRO_CS, 1000);
-
-/* Or, use Software SPI:
-  G_SDO + XM_SDO -> tied together to the MISO pin!
-  then select any pins for the SPI lines, and the two CS pins above
-*/
-
 #define LSM9DS0_SCLK 13
 #define LSM9DS0_MISO 12
 #define LSM9DS0_MOSI 11
-
-//Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(LSM9DS0_SCLK, LSM9DS0_MISO, LSM9DS0_MOSI, LSM9DS0_XM_CS, LSM9DS0_GYRO_CS, 1000);
-
 
 float xNormal = -3.0;
 float yNormal = 1;
@@ -63,8 +44,7 @@ float yNormal = 1;
     sensor API sensor_t type (see Adafruit_Sensor for more information)
 */
 /**************************************************************************/
-void displaySensorDetails(void)
-{
+void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
 
   lsm.getSensor(&accel, &mag, &gyro, &temp);
@@ -117,8 +97,7 @@ void displaySensorDetails(void)
     Configures the gain and integration time for the TSL2561
 */
 /**************************************************************************/
-void configureSensor(void)
-{
+void configureSensor(void) {
   // 1.) Set the accelerometer range
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_2G);
   lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_4G);
@@ -143,8 +122,7 @@ void configureSensor(void)
     Arduino setup function (automatically called at startup)
 */
 /**************************************************************************/
-void setup(void)
-{
+void setup(void) {
 //  while (!Serial);  // wait for flora/leonardo
 //
 //  Serial.begin(9600);
@@ -175,8 +153,7 @@ void setup(void)
     should go here)
 */
 /**************************************************************************/
-void loop(void)
-{
+void loop(void) {
   /* Get a new sensor event */
   sensors_event_t accel, mag, gyro, temp;
 
