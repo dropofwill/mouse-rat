@@ -38,58 +38,55 @@ Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
 float xNormal = -3.0;
 float yNormal = 1;
 
-/**************************************************************************/
-/*
-    Displays some basic information on this sensor from the unified
-    sensor API sensor_t type (see Adafruit_Sensor for more information)
-*/
-/**************************************************************************/
+float xRange[2] = [0,0]
+float yRange[2] = [0,0]
+
 void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
 
   lsm.getSensor(&accel, &mag, &gyro, &temp);
 
-//  Serial.println(F("------------------------------------"));
-//  Serial.print  (F("Sensor:       ")); Serial.println(accel.name);
-//  Serial.print  (F("Driver Ver:   ")); Serial.println(accel.version);
-//  Serial.print  (F("Unique ID:    ")); Serial.println(accel.sensor_id);
-//  Serial.print  (F("Max Value:    ")); Serial.print(accel.max_value); Serial.println(F(" m/s^2"));
-//  Serial.print  (F("Min Value:    ")); Serial.print(accel.min_value); Serial.println(F(" m/s^2"));
-//  Serial.print  (F("Resolution:   ")); Serial.print(accel.resolution); Serial.println(F(" m/s^2"));
-//  Serial.println(F("------------------------------------"));
-//  Serial.println(F(""));
-//
-//  Serial.println(F("------------------------------------"));
-//  Serial.print  (F("Sensor:       ")); Serial.println(mag.name);
-//  Serial.print  (F("Driver Ver:   ")); Serial.println(mag.version);
-//  Serial.print  (F("Unique ID:    ")); Serial.println(mag.sensor_id);
-//  Serial.print  (F("Max Value:    ")); Serial.print(mag.max_value); Serial.println(F(" uT"));
-//  Serial.print  (F("Min Value:    ")); Serial.print(mag.min_value); Serial.println(F(" uT"));
-//  Serial.print  (F("Resolution:   ")); Serial.print(mag.resolution); Serial.println(F(" uT"));
-//  Serial.println(F("------------------------------------"));
-//  Serial.println(F(""));
-//
-//  Serial.println(F("------------------------------------"));
-//  Serial.print  (F("Sensor:       ")); Serial.println(gyro.name);
-//  Serial.print  (F("Driver Ver:   ")); Serial.println(gyro.version);
-//  Serial.print  (F("Unique ID:    ")); Serial.println(gyro.sensor_id);
-//  Serial.print  (F("Max Value:    ")); Serial.print(gyro.max_value); Serial.println(F(" rad/s"));
-//  Serial.print  (F("Min Value:    ")); Serial.print(gyro.min_value); Serial.println(F(" rad/s"));
-//  Serial.print  (F("Resolution:   ")); Serial.print(gyro.resolution); Serial.println(F(" rad/s"));
-//  Serial.println(F("------------------------------------"));
-//  Serial.println(F(""));
-//
-//  Serial.println(F("------------------------------------"));
-//  Serial.print  (F("Sensor:       ")); Serial.println(temp.name);
-//  Serial.print  (F("Driver Ver:   ")); Serial.println(temp.version);
-//  Serial.print  (F("Unique ID:    ")); Serial.println(temp.sensor_id);
-//  Serial.print  (F("Max Value:    ")); Serial.print(temp.max_value); Serial.println(F(" C"));
-//  Serial.print  (F("Min Value:    ")); Serial.print(temp.min_value); Serial.println(F(" C"));
-//  Serial.print  (F("Resolution:   ")); Serial.print(temp.resolution); Serial.println(F(" C"));
-//  Serial.println(F("------------------------------------"));
-//  Serial.println(F(""));
-//
-//  delay(500);
+  Serial.println(F("------------------------------------"));
+  Serial.print  (F("Sensor:       ")); Serial.println(accel.name);
+  Serial.print  (F("Driver Ver:   ")); Serial.println(accel.version);
+  Serial.print  (F("Unique ID:    ")); Serial.println(accel.sensor_id);
+  Serial.print  (F("Max Value:    ")); Serial.print(accel.max_value); Serial.println(F(" m/s^2"));
+  Serial.print  (F("Min Value:    ")); Serial.print(accel.min_value); Serial.println(F(" m/s^2"));
+  Serial.print  (F("Resolution:   ")); Serial.print(accel.resolution); Serial.println(F(" m/s^2"));
+  Serial.println(F("------------------------------------"));
+  Serial.println(F(""));
+
+  Serial.println(F("------------------------------------"));
+  Serial.print  (F("Sensor:       ")); Serial.println(mag.name);
+  Serial.print  (F("Driver Ver:   ")); Serial.println(mag.version);
+  Serial.print  (F("Unique ID:    ")); Serial.println(mag.sensor_id);
+  Serial.print  (F("Max Value:    ")); Serial.print(mag.max_value); Serial.println(F(" uT"));
+  Serial.print  (F("Min Value:    ")); Serial.print(mag.min_value); Serial.println(F(" uT"));
+  Serial.print  (F("Resolution:   ")); Serial.print(mag.resolution); Serial.println(F(" uT"));
+  Serial.println(F("------------------------------------"));
+  Serial.println(F(""));
+
+  Serial.println(F("------------------------------------"));
+  Serial.print  (F("Sensor:       ")); Serial.println(gyro.name);
+  Serial.print  (F("Driver Ver:   ")); Serial.println(gyro.version);
+  Serial.print  (F("Unique ID:    ")); Serial.println(gyro.sensor_id);
+  Serial.print  (F("Max Value:    ")); Serial.print(gyro.max_value); Serial.println(F(" rad/s"));
+  Serial.print  (F("Min Value:    ")); Serial.print(gyro.min_value); Serial.println(F(" rad/s"));
+  Serial.print  (F("Resolution:   ")); Serial.print(gyro.resolution); Serial.println(F(" rad/s"));
+  Serial.println(F("------------------------------------"));
+  Serial.println(F(""));
+
+  Serial.println(F("------------------------------------"));
+  Serial.print  (F("Sensor:       ")); Serial.println(temp.name);
+  Serial.print  (F("Driver Ver:   ")); Serial.println(temp.version);
+  Serial.print  (F("Unique ID:    ")); Serial.println(temp.sensor_id);
+  Serial.print  (F("Max Value:    ")); Serial.print(temp.max_value); Serial.println(F(" C"));
+  Serial.print  (F("Min Value:    ")); Serial.print(temp.min_value); Serial.println(F(" C"));
+  Serial.print  (F("Resolution:   ")); Serial.print(temp.resolution); Serial.println(F(" C"));
+  Serial.println(F("------------------------------------"));
+  Serial.println(F(""));
+
+  delay(500);
 }
 
 /**************************************************************************/
@@ -123,46 +120,20 @@ void configureSensor(void) {
 */
 /**************************************************************************/
 void setup(void) {
-//  while (!Serial);  // wait for flora/leonardo
-//
-//  Serial.begin(9600);
-//  Serial.println(F("LSM9DS0 9DOF Sensor Test")); Serial.println("");
+  Serial.begin(9600);
 
   /* Initialise the sensor */
-  if(!lsm.begin())
-  {
-    /* There was a problem detecting the LSM9DS0 ... check your connections */
-//    Serial.print(F("Ooops, no LSM9DS0 detected ... Check your wiring or I2C ADDR!"));
-    while(1);
-  }
-//  Serial.println(F("Found LSM9DS0 9DOF"));
-
-  /* Display some basic information on this sensor */
-  displaySensorDetails();
+  if(!lsm.begin()) { while(1); }
 
   /* Setup the sensor gain and integration time */
   configureSensor();
-
-  /* We're ready to go! */
-//  Serial.println("");
 }
 
-/**************************************************************************/
-/*
-    Arduino loop function, called once 'setup' is complete (your own code
-    should go here)
-*/
-/**************************************************************************/
 void loop(void) {
   /* Get a new sensor event */
   sensors_event_t accel, mag, gyro, temp;
 
   lsm.getEvent(&accel, &mag, &gyro, &temp);
-
-  // print out accelleration data
-//  Serial.print("Accel X: "); Serial.print(accel.acceleration.x); Serial.print(" ");
-//  Serial.print("  \tY: "); Serial.print(accel.acceleration.y);       Serial.print(" ");
-//  Serial.print("  \tZ: "); Serial.print(accel.acceleration.z);     Serial.println("  \tm/s^2");
 
   float mx, my = 0.0;
 
@@ -175,22 +146,32 @@ void loop(void) {
     mx = map(accel.acceleration.y - yNormal, -20, 20, 200, -200);
   }
 
+  calibrate(accel.acceleration.x, accel.acceleration.y);
+
   Mouse.move(mx, my, 0);
 
-//  // print out magnetometer data
+  // print out accelleration data
+//  Serial.print("Accel X: "); Serial.print(accel.acceleration.x); Serial.print(" ");
+//  Serial.print("  \tY: "); Serial.print(accel.acceleration.y);   Serial.print(" ");
+//  Serial.print("  \tZ: "); Serial.print(accel.acceleration.z);   Serial.println("  \tm/s^2");
 //  Serial.print("Magn. X: "); Serial.print(mag.magnetic.x); Serial.print(" ");
 //  Serial.print("  \tY: "); Serial.print(mag.magnetic.y);       Serial.print(" ");
 //  Serial.print("  \tZ: "); Serial.print(mag.magnetic.z);     Serial.println("  \tgauss");
-//
-//  // print out gyroscopic data
 //  Serial.print("Gyro  X: "); Serial.print(gyro.gyro.x); Serial.print(" ");
 //  Serial.print("  \tY: "); Serial.print(gyro.gyro.y);       Serial.print(" ");
 //  Serial.print("  \tZ: "); Serial.print(gyro.gyro.z);     Serial.println("  \tdps");
-
-  // print out temperature data
 //  Serial.print("Temp: "); Serial.print(temp.temperature); Serial.println(" *C");
-//
-//  Serial.println("**********************\n");
 
   delay(16);
 }
+
+void calibrate(float x, float y) {
+   xRange[0] = min(xRange[0], x);
+   xRange[1] = max(xRange[1], x);
+   
+   yRange[0] = min(yRange[0], y);
+   yRange[1] = max(yRange[1], y);
+   
+   Serial.print(xRange[0]); Serial.print(", "); Serial.println(xRange[1]);
+   Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
+ }
