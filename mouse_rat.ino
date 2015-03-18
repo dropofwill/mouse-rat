@@ -29,23 +29,8 @@
 
 /* Assign a unique base ID for this sensor */
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(1000);  // Use I2C, ID #1000
-
-/* Or, use Hardware SPI:
-  SCK -> SPI CLK
-  SDA -> SPI MOSI
-  G_SDO + XM_SDO -> tied together to SPI MISO
-  then select any two pins for the two CS lines:
-*/
-
 #define LSM9DS0_XM_CS 10
 #define LSM9DS0_GYRO_CS 9
-
-//Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0(LSM9DS0_XM_CS, LSM9DS0_GYRO_CS, 1000);
-/* Or, use Software SPI:
-  G_SDO + XM_SDO -> tied together to the MISO pin!
-  then select any pins for the SPI lines, and the two CS pins above
-*/
-
 #define LSM9DS0_SCLK 13
 #define LSM9DS0_MISO 12
 #define LSM9DS0_MOSI 11
@@ -142,6 +127,11 @@ void setup(void) {
 
   /* Setup the sensor gain and integration time */
   configureSensor();
+  
+  sensors_event_t accel, mag, gyro, temp;
+  lsm.getEvent(&accel, &mag, &gyro, &temp);  
+  
+  calibrate(accel.acceleration.x, accel.acceleration.y);
 }
 
 void loop(void) {
@@ -151,17 +141,16 @@ void loop(void) {
   lsm.getEvent(&accel, &mag, &gyro, &temp);
 
   float mx, my = 0.0;
+  float accel_x = clamp(accel.acceleration.y, -20, 20)
 
-  if (accel.acceleration.x > xNormal || accel.acceleration.x > -xNormal) {
+  if (accel.acceleration.x > xRange[1] || accel.acceleration.x < xRange[0]) {
     my = map(accel.acceleration.x - xNormal, -20, 20, 200, -200);
     mx = map(accel.acceleration.y - yNormal, -20, 20, 200, -200);
   }
-  else if (accel.acceleration.y > yNormal || accel.acceleration.y > -yNormal) {
+  else if (accel.acceleration.y > yRange[1] || accel.acceleration.y < yRange[0]) {
     my = map(accel.acceleration.x - xNormal, -20, 20, 200, -200);
     mx = map(accel.acceleration.y - yNormal, -20, 20, 200, -200);
   }
-
-  calibrate(accel.acceleration.x, accel.acceleration.y);
   Mouse.move(mx, my, 0);
 
 //  print out accelleration data
@@ -176,7 +165,7 @@ void loop(void) {
 //  Serial.print("  \tZ: "); Serial.print(gyro.gyro.z);     Serial.println("  \tdps");
 //  Serial.print("Temp: "); Serial.print(temp.temperature); Serial.println(" *C");
 
-  delay(16);
+  delay(10);
 }
 
 void calibrate(float x, float y) {
@@ -186,6 +175,14 @@ void calibrate(float x, float y) {
    yRange[0] = min(yRange[0], y);
    yRange[1] = max(yRange[1], y);
    
+   xNormal = (xRange[0] + xRange[1])/2;
+   yNormal = (yRange[0] + yRange[1])/2;
+   
    Serial.print(xRange[0]); Serial.print(", "); Serial.println(xRange[1]);
    Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
  }
+ 
+template<typename T>
+T clamp(T Value, T Min, T Max) {
+  return (Value < Min)? Min : (Value > Max)? Max : Value;
+}
