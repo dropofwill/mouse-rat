@@ -79,9 +79,14 @@ void setup(void) {
   mpr_setup();
 }
 
+void loop(void) {
+  dof_loop();
+  mpr_loop();
+}
 
 void mpr_setup() {
-  while (!Serial);        // needed to keep leonardo/micro from starting too fast!
+  // needed to keep leonardo/micro from starting too fast!
+  while (!Serial);
 
   Serial.begin(9600);
   Serial.println("Adafruit MPR121 Capacitive Touch sensor test"); 
@@ -96,7 +101,6 @@ void mpr_setup() {
 }
 
 void dof_setup() {
-  // 9DOF
   if(!lsm.begin()) { while(1); }
 
   /* Setup the sensor gain and integration time */
@@ -109,11 +113,6 @@ void dof_setup() {
   lsm.getEvent(&accel, &mag, &gyro, &temp);  
 }
 
-void loop(void) {
-  dof_loop();
-  mpr_loop();
-}
-
 void dof_loop() {
   /* Get a new sensor event */
   sensors_event_t accel, mag, gyro, temp;
@@ -121,15 +120,16 @@ void dof_loop() {
   lsm.getEvent(&accel, &mag, &gyro, &temp);
 
   float mx, my = 0.0;
-//  float accel_x = clamp(accel.acceleration.y, -20, 20)
+  float accel_x = clamp(accel.acceleration.x, -20, 20);
+  float accel_y = clamp(accel.acceleration.y, -20, 20);
 
   if (accel.acceleration.x > xRange[1] || accel.acceleration.x < xRange[0]) {
-    my = map(accel.acceleration.x - xNormal, -20, 20, 200, -200);
-    mx = map(accel.acceleration.y - yNormal, -20, 20, 200, -200);
+    my = map(accel_x - xNormal, -20, 20, 200, -200);
+    mx = map(accel_y - yNormal, -20, 20, 200, -200);
   }
   else if (accel.acceleration.y > yRange[1] || accel.acceleration.y < yRange[0]) {
-    my = map(accel.acceleration.x - xNormal, -20, 20, 200, -200);
-    mx = map(accel.acceleration.y - yNormal, -20, 20, 200, -200);
+    my = map(accel_x - xNormal, -20, 20, 200, -200);
+    mx = map(accel_y - yNormal, -20, 20, 200, -200);
   }
   Mouse.move(mx, my, 0);
   delay(10);
@@ -187,11 +187,9 @@ void calibrate(float x, float y) {
    Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
 }
 
-//template<typename T>
-//T clamp(T Value, T Min, T Max) {
-//  return (Value < Min)? Min : (Value > Max)? Max : Value;
-//}
-
+float clamp(float value, float min_, float max_) {
+  return (value < min_)? min_ : (value > max_)? max_ : value;
+}
 
 void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
