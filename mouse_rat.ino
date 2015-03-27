@@ -25,6 +25,8 @@ float xNormal = -3.0,
       outMin   =  200,
       outMax   = -200;
 
+int calibrationCounter = 0;
+
 float xRange[] = {0,0};
 float yRange[] = {0,0};
 
@@ -38,20 +40,20 @@ uint16_t lasttouched = 0,
 
 // Configures the gain and integration time for the TSL2561
 void configureSensor(void) {
-  // 1.) Set the accelerometer range
+  // Set the accelerometer range
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_2G);
   lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_4G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_6G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_8G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_16G);
 
-  // 2.) Set the magnetometer sensitivity
+  // Set the magnetometer sensitivity
   lsm.setupMag(lsm.LSM9DS0_MAGGAIN_2GAUSS);
   //lsm.setupMag(lsm.LSM9DS0_MAGGAIN_4GAUSS);
   //lsm.setupMag(lsm.LSM9DS0_MAGGAIN_8GAUSS);
   //lsm.setupMag(lsm.LSM9DS0_MAGGAIN_12GAUSS);
 
-  // 3.) Setup the gyroscope
+  // Setup the gyroscope
   lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_245DPS);
   //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_500DPS);
   //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_2000DPS);
@@ -75,17 +77,12 @@ void loop(void) {
 void mpr_setup() {
   // needed to keep leonardo/micro from starting too fast!
   while (!Serial);
-
-  Serial.begin(9600);
-  Serial.println("Adafruit MPR121 Capacitive Touch sensor test"); 
+  Serial.begin(9600);    Serial.println("Adafruit MPR121 Capacitive Touch sensor test"); 
   
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  if (!cap.begin(0x5A)) {
-    Serial.println("MPR121 not found, check wiring?");
-    while (1);
-  }
-  Serial.println("MPR121 found!");
+  if (!cap.begin(0x5A))  Serial.println("MPR121 not found");
+  else                   Serial.println("MPR121 found!");
 }
 
 
@@ -111,17 +108,22 @@ void dof_loop() {
   float accelX = clamp(accel.acceleration.x, accelMin, accelMax);
   float accelY = clamp(accel.acceleration.y, accelMin, accelMax);
 
-  if (accel.acceleration.x > xRange[1] || accel.acceleration.x < xRange[0]) {
-    my = map(accelX, accelMin, accelMax, outMax, outMin);
-    mx = map(accelY, accelMin, accelMax, outMax, outMin);
+  if (calibrationCounter > 5) {
+  
+    if (accel.acceleration.x < xRange[0] || accel.acceleration.x > xRange[1]) {
+      mx = map(accelY - yNormal, accelMin, accelMax, outMax, outMin);
+    }
+    
+    if (accel.acceleration.y < yRange[0] || accel.acceleration.y > yRange[1]) {
+      my = map(accelX - xNormal, accelMin, accelMax, outMax, outMin);
+    }
+  
+    Mouse.move(mx, my, 0);
+  else {
+    calibrationCounter++;
+    calibrate(accelX, accelY);
   }
-  else if (accel.acceleration.y > yRange[1] || accel.acceleration.y < yRange[0]) {
-    my = map(accelX, accelMin, accelMax, outMax, outMin);
-    mx = map(accelY, accelMin, accelMax, outMax, outMin);
-  }
-
-  Mouse.move(mx, my, 0);
-  delay(5);
+  delay(7);
 }
 
 
@@ -142,6 +144,21 @@ void checkTouch() {
     // if it /was/ touched and now /isn't/, alert!
     if ( !(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) releaseHandler(i);
   } 
+}
+
+
+void calibrate(float x, float y) {
+  xRange[0] = min(xRange[0], x);
+  xRange[1] = max(xRange[1], x);
+   
+  yRange[0] = min(yRange[0], y);
+  yRange[1] = max(yRange[1], y);
+   
+  xNormal = (xRange[0] + xRange[1])/2;
+  yNormal = (yRange[0] + yRange[1])/2;
+   
+  Serial.print(xRange[0]); Serial.print(", "); Serial.println(xRange[1]);
+  Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
 }
 
 
@@ -179,21 +196,6 @@ void releaseHandler(int id) {
 }
 
 
-void calibrate(float x, float y) {
-   xRange[0] = min(xRange[0], x);
-   xRange[1] = max(xRange[1], x);
-   
-   yRange[0] = min(yRange[0], y);
-   yRange[1] = max(yRange[1], y);
-   
-   xNormal = (xRange[0] + xRange[1])/2;
-   yNormal = (yRange[0] + yRange[1])/2;
-   
-   Serial.print(xRange[0]); Serial.print(", "); Serial.println(xRange[1]);
-   Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
-}
-
-
 float clamp(float value, float min_, float max_) {
   return (value < min_) ? min_ : (value > max_) ? max_ : value;
 }
@@ -201,7 +203,6 @@ float clamp(float value, float min_, float max_) {
 
 void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
-
   lsm.getSensor(&accel, &mag, &gyro, &temp);
 
   Serial.println(F("------------------------------------"));
@@ -211,36 +212,6 @@ void displaySensorDetails(void) {
   Serial.print  (F("Max Value:    ")); Serial.print(accel.max_value); Serial.println(F(" m/s^2"));
   Serial.print  (F("Min Value:    ")); Serial.print(accel.min_value); Serial.println(F(" m/s^2"));
   Serial.print  (F("Resolution:   ")); Serial.print(accel.resolution); Serial.println(F(" m/s^2"));
-  Serial.println(F("------------------------------------"));
-  Serial.println(F(""));
-
-  Serial.println(F("------------------------------------"));
-  Serial.print  (F("Sensor:       ")); Serial.println(mag.name);
-  Serial.print  (F("Driver Ver:   ")); Serial.println(mag.version);
-  Serial.print  (F("Unique ID:    ")); Serial.println(mag.sensor_id);
-  Serial.print  (F("Max Value:    ")); Serial.print(mag.max_value); Serial.println(F(" uT"));
-  Serial.print  (F("Min Value:    ")); Serial.print(mag.min_value); Serial.println(F(" uT"));
-  Serial.print  (F("Resolution:   ")); Serial.print(mag.resolution); Serial.println(F(" uT"));
-  Serial.println(F("------------------------------------"));
-  Serial.println(F(""));
-
-  Serial.println(F("------------------------------------"));
-  Serial.print  (F("Sensor:       ")); Serial.println(gyro.name);
-  Serial.print  (F("Driver Ver:   ")); Serial.println(gyro.version);
-  Serial.print  (F("Unique ID:    ")); Serial.println(gyro.sensor_id);
-  Serial.print  (F("Max Value:    ")); Serial.print(gyro.max_value); Serial.println(F(" rad/s"));
-  Serial.print  (F("Min Value:    ")); Serial.print(gyro.min_value); Serial.println(F(" rad/s"));
-  Serial.print  (F("Resolution:   ")); Serial.print(gyro.resolution); Serial.println(F(" rad/s"));
-  Serial.println(F("------------------------------------"));
-  Serial.println(F(""));
-
-  Serial.println(F("------------------------------------"));
-  Serial.print  (F("Sensor:       ")); Serial.println(temp.name);
-  Serial.print  (F("Driver Ver:   ")); Serial.println(temp.version);
-  Serial.print  (F("Unique ID:    ")); Serial.println(temp.sensor_id);
-  Serial.print  (F("Max Value:    ")); Serial.print(temp.max_value); Serial.println(F(" C"));
-  Serial.print  (F("Min Value:    ")); Serial.print(temp.min_value); Serial.println(F(" C"));
-  Serial.print  (F("Resolution:   ")); Serial.print(temp.resolution); Serial.println(F(" C"));
   Serial.println(F("------------------------------------"));
   Serial.println(F(""));
 
