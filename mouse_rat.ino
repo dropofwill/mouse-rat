@@ -93,7 +93,6 @@ void dof_setup() {
   configureSensor();
   
   // Set a max and min value to not do anything
-  // calibrate(accel.acceleration.x, accel.acceleration.y);
   sensors_event_t accel, mag, gyro, temp;
   lsm.getEvent(&accel, &mag, &gyro, &temp);  
 }
@@ -119,9 +118,10 @@ void dof_loop() {
     }
   
     Mouse.move(mx, my, 0);
+  }
   else {
     calibrationCounter++;
-    calibrate(accelX, accelY);
+    calibrate(accel.acceleration.x, accel.acceleration.y);
   }
   delay(7);
 }
@@ -137,7 +137,7 @@ void mpr_loop() {
 
 
 void checkTouch() {
-  for (uint8_t i=0; i < 12; i++) {
+  for (uint8_t i = 0; i < 12; i++) {
     // it if /is/ touched and /wasn't/ touched before, alert!
     if ( (currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) touchHandler(i);
 
