@@ -28,8 +28,13 @@ float xNormal = -3.0,
 float xRange[] = {0,0};
 float yRange[] = {0,0};
 
-uint16_t lasttouched = 0;
-uint16_t currtouched = 0;
+const int MOUSE_LEFT_PIN = 10,
+          MOUSE_MID_PIN   = 8,
+          MOUSE_RIGHT_PIN = 6;
+    
+uint16_t lasttouched = 0,
+         currtouched = 0;
+
 
 // Configures the gain and integration time for the TSL2561
 void configureSensor(void) {
@@ -52,6 +57,7 @@ void configureSensor(void) {
   //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_2000DPS);
 }
 
+
 void setup(void) {
   Serial.begin(9600);
   
@@ -59,10 +65,12 @@ void setup(void) {
   mpr_setup();
 }
 
+
 void loop(void) {
   dof_loop();
   mpr_loop();
 }
+
 
 void mpr_setup() {
   // needed to keep leonardo/micro from starting too fast!
@@ -80,6 +88,7 @@ void mpr_setup() {
   Serial.println("MPR121 found!");
 }
 
+
 void dof_setup() {
   if(!lsm.begin()) { while(1); }
 
@@ -91,6 +100,7 @@ void dof_setup() {
   sensors_event_t accel, mag, gyro, temp;
   lsm.getEvent(&accel, &mag, &gyro, &temp);  
 }
+
 
 void dof_loop() {
   /* Get a new sensor event */
@@ -114,6 +124,7 @@ void dof_loop() {
   delay(5);
 }
 
+
 void mpr_loop() {
   // Get the currently touched pads
   currtouched = cap.touched();
@@ -122,23 +133,51 @@ void mpr_loop() {
   lasttouched = currtouched;
 }
 
+
 void checkTouch() {
   for (uint8_t i=0; i < 12; i++) {
-    // it if *is* touched and *wasnt* touched before, alert!
+    // it if /is/ touched and /wasn't/ touched before, alert!
     if ( (currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) touchHandler(i);
 
-    // if it *was* touched and now *isnt*, alert!
+    // if it /was/ touched and now /isn't/, alert!
     if ( !(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) releaseHandler(i);
   } 
 }
 
+
 void touchHandler(int id) {
-  Serial.print(id); Serial.println(" released");
+  Serial.print(id); Serial.println(" touched");
+  
+  switch(id) {
+    case MOUSE_LEFT_PIN:
+      Mouse.press(MOUSE_LEFT);
+      break;
+    case MOUSE_MID_PIN:
+      Mouse.press(MOUSE_MIDDLE);
+      break;
+    case MOUSE_RIGHT_PIN:
+      Mouse.press(MOUSE_RIGHT);
+      break;
+  }
 }
 
+
 void releaseHandler(int id) {
-  Serial.print(id); Serial.println(" touched");
+  Serial.print(id); Serial.println(" released");
+    
+  switch(id) {
+    case MOUSE_LEFT_PIN:
+      Mouse.release(MOUSE_LEFT);
+      break;
+    case MOUSE_MID_PIN:
+      Mouse.release(MOUSE_MIDDLE);
+      break;
+    case MOUSE_RIGHT_PIN:
+      Mouse.release(MOUSE_RIGHT);
+      break;
+  }
 }
+
 
 void calibrate(float x, float y) {
    xRange[0] = min(xRange[0], x);
@@ -154,9 +193,11 @@ void calibrate(float x, float y) {
    Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
 }
 
+
 float clamp(float value, float min_, float max_) {
   return (value < min_) ? min_ : (value > max_) ? max_ : value;
 }
+
 
 void displaySensorDetails(void) {
   sensor_t accel, mag, gyro, temp;
