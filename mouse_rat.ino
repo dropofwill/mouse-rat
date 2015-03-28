@@ -22,17 +22,17 @@ float xNormal = -3.0,
       accelMax =  20,
       accelMin = -20,
       // Map inputs to this range (pixels)
-      outMin   =  200,
-      outMax   = -200;
+      outMin   =  50,
+      outMax   = -50;
 
 int calibrationCounter = 0;
 
 float xRange[] = {0,0};
 float yRange[] = {0,0};
 
-const int MOUSE_LEFT_PIN = 10,
-          MOUSE_MID_PIN   = 8,
+const int MOUSE_LEFT_PIN = 8,
           MOUSE_RIGHT_PIN = 6;
+//          MOUSE_MID_PIN   = 6;
     
 uint16_t lasttouched = 0,
          currtouched = 0;
@@ -94,7 +94,7 @@ void dof_setup() {
   
   // Set a max and min value to not do anything
   sensors_event_t accel, mag, gyro, temp;
-  lsm.getEvent(&accel, &mag, &gyro, &temp);  
+  lsm.getEvent(&accel, &mag, &gyro, &temp);
 }
 
 
@@ -107,16 +107,18 @@ void dof_loop() {
   float accelX = clamp(accel.acceleration.x, accelMin, accelMax);
   float accelY = clamp(accel.acceleration.y, accelMin, accelMax);
 
+  // calibrate for the first five loops
   if (calibrationCounter > 5) {
   
+    // Reversing the direction of inputs
     if (accel.acceleration.x < xRange[0] || accel.acceleration.x > xRange[1]) {
-      mx = map(accelY - yNormal, accelMin, accelMax, outMax, outMin);
+      mx = map(accelY - yNormal, accelMin, accelMax, outMin, outMax);
     }
     
     if (accel.acceleration.y < yRange[0] || accel.acceleration.y > yRange[1]) {
-      my = map(accelX - xNormal, accelMin, accelMax, outMax, outMin);
+      my = map(accelX - xNormal, accelMin, accelMax, outMin, outMax);
     }
-  
+
     Mouse.move(mx, my, 0);
   }
   else {
@@ -163,33 +165,30 @@ void calibrate(float x, float y) {
 
 
 void touchHandler(int id) {
-  Serial.print(id); Serial.println(" touched");
   
   switch(id) {
     case MOUSE_LEFT_PIN:
+      Serial.println("Left button touched"); Serial.println("");
       Mouse.press(MOUSE_LEFT);
       break;
-    case MOUSE_MID_PIN:
-      Mouse.press(MOUSE_MIDDLE);
-      break;
+//    case MOUSE_MID_PIN:
+//      Mouse.press(MOUSE_MIDDLE);
+//      break;
     case MOUSE_RIGHT_PIN:
-      Mouse.press(MOUSE_RIGHT);
-      break;
-  }
-}
-
 
 void releaseHandler(int id) {
-  Serial.print(id); Serial.println(" released");
+  //Serial.print(id); Serial.println(" released");
     
   switch(id) {
     case MOUSE_LEFT_PIN:
       Mouse.release(MOUSE_LEFT);
+      Serial.println("Left button released"); Serial.println("");
       break;
-    case MOUSE_MID_PIN:
-      Mouse.release(MOUSE_MIDDLE);
-      break;
+//    case MOUSE_MID_PIN:
+//      Mouse.release(MOUSE_MIDDLE);
+//      break;
     case MOUSE_RIGHT_PIN:
+      Serial.println("Right button released"); Serial.println("");
       Mouse.release(MOUSE_RIGHT);
       break;
   }
