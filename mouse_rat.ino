@@ -23,16 +23,20 @@ float xNormal = -3.0,
       accelMin = -20,
       // Map inputs to this range (pixels)
       outMin   =  50,
-      outMax   = -50;
+      outMax   = -50,
+      // How many milliseconds between polling the accelerometer
+      delayRate = 7;
+      
+const boolean DEBUG = true;
 
 int calibrationCounter = 0;
 
 float xRange[] = {0,0};
 float yRange[] = {0,0};
 
-const int MOUSE_LEFT_PIN = 8,
-          MOUSE_RIGHT_PIN = 6;
-//          MOUSE_MID_PIN   = 6;
+const int MOUSE_LEFT_PIN = 10,
+          MOUSE_RIGHT_PIN = 6,
+          MOUSE_MID_PIN   = 8;
     
 uint16_t lasttouched = 0,
          currtouched = 0;
@@ -61,7 +65,7 @@ void configureSensor(void) {
 
 
 void setup(void) {
-  Serial.begin(9600);
+  if (DEBUG) Serial.begin(9600);
   
   dof_setup();
   mpr_setup();
@@ -77,12 +81,12 @@ void loop(void) {
 void mpr_setup() {
   // needed to keep leonardo/micro from starting too fast!
   while (!Serial);
-  Serial.begin(9600);    Serial.println("Adafruit MPR121 Capacitive Touch sensor test"); 
+  if (DEBUG) Serial.begin(9600); Serial.println("Adafruit MPR121 Capacitive Touch sensor test"); 
   
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  if (!cap.begin(0x5A))  Serial.println("MPR121 not found");
-  else                   Serial.println("MPR121 found!");
+  if (!cap.begin(0x5A))  if (DEBUG) Serial.println("MPR121 not found");
+  else                   if (DEBUG) Serial.println("MPR121 found!");
 }
 
 
@@ -125,7 +129,7 @@ void dof_loop() {
     calibrationCounter++;
     calibrate(accel.acceleration.x, accel.acceleration.y);
   }
-  delay(7);
+  delay(delayRate);
 }
 
 
@@ -158,9 +162,11 @@ void calibrate(float x, float y) {
    
   xNormal = (xRange[0] + xRange[1])/2;
   yNormal = (yRange[0] + yRange[1])/2;
-   
-  Serial.print(xRange[0]); Serial.print(", "); Serial.println(xRange[1]);
-  Serial.print(yRange[0]); Serial.print(", "); Serial.println(yRange[1]);
+  
+  if (DEBUG) {
+    Serial.print("X Min: "); Serial.print(xRange[0]); Serial.print(", Max: "); Serial.println(xRange[1]);
+    Serial.print("Y Min: "); Serial.print(yRange[0]); Serial.print(", Max: "); Serial.println(yRange[1]);
+  }
 }
 
 
@@ -168,27 +174,34 @@ void touchHandler(int id) {
   
   switch(id) {
     case MOUSE_LEFT_PIN:
-      Serial.println("Left button touched"); Serial.println("");
+      if (DEBUG) Serial.println("Left button touched"); Serial.println("");
       Mouse.press(MOUSE_LEFT);
       break;
-//    case MOUSE_MID_PIN:
-//      Mouse.press(MOUSE_MIDDLE);
-//      break;
+    case MOUSE_MID_PIN:
+      if (DEBUG) Serial.println("Middle button touched"); Serial.println("");
+      Mouse.press(MOUSE_MIDDLE);
+      break;
     case MOUSE_RIGHT_PIN:
+      if (DEBUG) Serial.println("Right button touched"); Serial.println("");
+      Mouse.press(MOUSE_RIGHT);
+      break;
+  }
+}
+
 
 void releaseHandler(int id) {
-  //Serial.print(id); Serial.println(" released");
     
   switch(id) {
     case MOUSE_LEFT_PIN:
+      if (DEBUG) Serial.println("Left button released"); Serial.println("");
       Mouse.release(MOUSE_LEFT);
-      Serial.println("Left button released"); Serial.println("");
       break;
-//    case MOUSE_MID_PIN:
-//      Mouse.release(MOUSE_MIDDLE);
-//      break;
+    case MOUSE_MID_PIN:
+      if (DEBUG) Serial.println("Middle button released"); Serial.println("");
+      Mouse.release(MOUSE_MIDDLE);
+      break;
     case MOUSE_RIGHT_PIN:
-      Serial.println("Right button released"); Serial.println("");
+      if (DEBUG) Serial.println("Right button released"); Serial.println("");
       Mouse.release(MOUSE_RIGHT);
       break;
   }
@@ -200,19 +213,20 @@ float clamp(float value, float min_, float max_) {
 }
 
 
-void displaySensorDetails(void) {
+void displaySensorDetails(int delayAmt) {
   sensor_t accel, mag, gyro, temp;
   lsm.getSensor(&accel, &mag, &gyro, &temp);
 
-  Serial.println(F("------------------------------------"));
-  Serial.print  (F("Sensor:       ")); Serial.println(accel.name);
-  Serial.print  (F("Driver Ver:   ")); Serial.println(accel.version);
-  Serial.print  (F("Unique ID:    ")); Serial.println(accel.sensor_id);
-  Serial.print  (F("Max Value:    ")); Serial.print(accel.max_value); Serial.println(F(" m/s^2"));
-  Serial.print  (F("Min Value:    ")); Serial.print(accel.min_value); Serial.println(F(" m/s^2"));
-  Serial.print  (F("Resolution:   ")); Serial.print(accel.resolution); Serial.println(F(" m/s^2"));
-  Serial.println(F("------------------------------------"));
-  Serial.println(F(""));
-
-  delay(500);
+  if (DEBUG) {
+    Serial.println(F("------------------------------------"));
+    Serial.print  (F("Sensor:       ")); Serial.println(accel.name);
+    Serial.print  (F("Driver Ver:   ")); Serial.println(accel.version);
+    Serial.print  (F("Unique ID:    ")); Serial.println(accel.sensor_id);
+    Serial.print  (F("Max Value:    ")); Serial.print(accel.max_value); Serial.println(F(" m/s^2"));
+    Serial.print  (F("Min Value:    ")); Serial.print(accel.min_value); Serial.println(F(" m/s^2"));
+    Serial.print  (F("Resolution:   ")); Serial.print(accel.resolution); Serial.println(F(" m/s^2"));
+    Serial.println(F("------------------------------------"));
+    Serial.println(F(""));
+  }
+  delay(delayAmt);
 }
