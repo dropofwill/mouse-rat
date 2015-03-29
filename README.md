@@ -1,18 +1,18 @@
 # mouse_rat
 
-Code for a gesture base Arduino mouse
+Code for a wearable gesture based mouse glove. Using Arduino Flora, the wearable LSM9DSO accelerometer, and MPR121 capacitive touch breakout, all from Adafruit.
 
 ## "Schematic"
 
-![Rough Schematic](http://github.com/dropofwill/mouse_rat/mouse_rat-schematic.jpg)
+![Rough Schematic](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-schematic.jpg)
 
 ## Pictures
 
-![Top Down](http://github.com/dropofwill/mouse_rat/mouse_rat-top-down.jpg)
+![Top Down](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-top-down.JPG)
 
-![Bottom Down](http://github.com/dropofwill/mouse_rat/mouse_rat-bottom-down.jpg)
+![Bottom Down](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-bottom-down.jpg)
 
-![Close Up](http://github.com/dropofwill/mouse_rat/mouse_rat-close-up.jpg)
+![Close Up](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-close-up.JPG)
 
 ## Dependencies
 
