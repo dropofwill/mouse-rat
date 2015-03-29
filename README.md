@@ -2,6 +2,18 @@
 
 Code for a gesture base Arduino mouse
 
+## "Schematic"
+
+![Rough Schematic](http://github.com/dropofwill/mouse_rat/mouse_rat-schematic.jpg)
+
+## Pictures
+
+![Top Down](http://github.com/dropofwill/mouse_rat/mouse_rat-top-down.jpg)
+
+![Bottom Down](http://github.com/dropofwill/mouse_rat/mouse_rat-bottom-down.jpg)
+
+![Close Up](http://github.com/dropofwill/mouse_rat/mouse_rat-close-up.jpg)
+
 ## Dependencies
 
 ### For the LSM303:
