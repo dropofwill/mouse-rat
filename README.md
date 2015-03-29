@@ -8,11 +8,11 @@ Code for a wearable gesture based mouse glove. Using Arduino Flora, the wearable
 
 ## Pictures
 
-![Top Down](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-top-down.JPG)
+![Top Down](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-top-down.jpg)
 
 ![Bottom Down](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-bottom-down.jpg)
 
-![Close Up](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-close-up.JPG)
+![Close Up](https://raw.githubusercontent.com/dropofwill/mouse_rat/master/mouse_rat-close-up.jpg)
 
 ## Dependencies
 
