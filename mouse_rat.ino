@@ -114,7 +114,6 @@ void dof_loop() {
   // calibrate for the first five loops
   if (calibrationCounter > 5) {
   
-    // Reversing the direction of inputs
     if (accel.acceleration.x < xRange[0] || accel.acceleration.x > xRange[1]) {
       mx = map(accelY - yNormal, accelMin, accelMax, outMin, outMax);
     }
@@ -126,8 +125,8 @@ void dof_loop() {
     Mouse.move(mx, my, 0);
   }
   else {
-    calibrationCounter++;
     calibrate(accel.acceleration.x, accel.acceleration.y);
+    calibrationCounter++;
   }
   delay(delayRate);
 }
@@ -154,18 +153,33 @@ void checkTouch() {
 
 
 void calibrate(float x, float y) {
-  xRange[0] = min(xRange[0], x);
-  xRange[1] = max(xRange[1], x);
-   
-  yRange[0] = min(yRange[0], y);
-  yRange[1] = max(yRange[1], y);
-   
+  if (calibrationCounter == 0) {
+    if (DEBUG)  Serial.print("First time");
+    xRange[0] = x;
+    xRange[1] = x;
+
+    yRange[0] = y;
+    yRange[1] = y;
+  }
+  else {
+    xRange[0] = min(xRange[0], x);
+    xRange[1] = max(xRange[1], x);
+     
+    yRange[0] = min(yRange[0], y);
+    yRange[1] = max(yRange[1], y);
+  }
+     
   xNormal = (xRange[0] + xRange[1])/2;
   yNormal = (yRange[0] + yRange[1])/2;
   
   if (DEBUG) {
-    Serial.print("X Min: "); Serial.print(xRange[0]); Serial.print(", Max: "); Serial.println(xRange[1]);
-    Serial.print("Y Min: "); Serial.print(yRange[0]); Serial.print(", Max: "); Serial.println(yRange[1]);
+    Serial.print("X Min: "); Serial.print(xRange[0]);
+    Serial.print(", Max: "); Serial.println(xRange[1]);
+    Serial.print(", Norm: "); Serial.println(xNormal);
+    
+    Serial.print("Y Min: "); Serial.print(yRange[0]);
+    Serial.print(", Max: "); Serial.println(yRange[1]);
+    Serial.print(", Norm: "); Serial.println(yNormal);
   }
 }
 
