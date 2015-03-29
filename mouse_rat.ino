@@ -22,14 +22,15 @@ float xNormal = -3.0,
       accelMax =  20,
       accelMin = -20,
       // Map inputs to this range (pixels)
-      outMin   =  50,
-      outMax   = -50,
+      outMin   =  30,
+      outMax   = -30,
       // How many milliseconds between polling the accelerometer
       delayRate = 7;
       
 const boolean DEBUG = true;
 
-int calibrationCounter = 0;
+int calibrationCounter = 0,
+    calibrationRuns = 20;
 
 float xRange[] = {0,0};
 float yRange[] = {0,0};
@@ -45,8 +46,8 @@ uint16_t lasttouched = 0,
 // Configures the gain and integration time for the TSL2561
 void configureSensor(void) {
   // Set the accelerometer range
-  //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_2G);
-  lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_4G);
+  lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_2G);
+  //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_4G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_6G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_8G);
   //lsm.setupAccel(lsm.LSM9DS0_ACCELRANGE_16G);
@@ -112,7 +113,7 @@ void dof_loop() {
   float accelY = clamp(accel.acceleration.y, accelMin, accelMax);
 
   // calibrate for the first five loops
-  if (calibrationCounter > 5) {
+  if (calibrationCounter > calibrationRuns) {
   
     if (accel.acceleration.x < xRange[0] || accel.acceleration.x > xRange[1]) {
       mx = map(accelY - yNormal, accelMin, accelMax, outMin, outMax);
