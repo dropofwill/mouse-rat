@@ -1,4 +1,4 @@
-# mouse_rat
+# mouse-rat
 
 Code for a wearable gesture based mouse glove. Using Arduino Flora, the wearable LSM9DSO accelerometer, and MPR121 capacitive touch breakout, all from Adafruit.
 
